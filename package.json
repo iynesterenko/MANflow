@@ -2,13 +2,13 @@
   "name": "manflow",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
+ "scripts": {
     "dev": "next dev",
-    "build": "prisma migrate deploy && next build",
+    "build": "prisma db push --force-reset && prisma db seed && next build",
     "start": "next start",
     "postinstall": "prisma generate",
     "lint": "eslint",
-    "seed": "tsx prisma/seed.ts"  
+    "seed": "tsx prisma/seed.ts"
   },
   "prisma":{
     "seed": "tsx prisma/seed.ts"
