@@ -6,8 +6,10 @@ import { jwtVerify } from "jose";
 export interface SessionPayload {
   adminId: string;
   email: string;
-  role: string;
+  role: UserRole; 
 }
+export type UserRole = 'SA' | 'CLERK' | 'ACCOUNTANT' | 'DIRECTOR'
+
 const COOKIE_NAME = process.env.COOKIE_NAME || "";
 const secretKey =
   process.env.JWT_SECRET || "fallback-secret-key-at-least-32-chars-long";
