@@ -1,21 +1,29 @@
 import { PrismaClient, Role, AdminStatus } from '../app/generated/prisma/client'
+import bcrypt from 'bcryptjs'
+
 const prisma = new PrismaClient()
 
 async function main() {
   const saEmail = process.env.INITIAL_SA_EMAIL
+  const saPassword = process.env.INITIAL_SA_PASSWORD
 
-  if (!saEmail) {
-    throw new Error('❌ INITIAL_SA_EMAIL не найдена в .env файле!')
+  if (!saEmail || !saPassword) {
+    throw new Error('❌ INITIAL_SA_EMAIL або INITIAL_SA_PASSWORD не знайдено в .env файлі!')
   }
+
+  const passwordHash = await bcrypt.hashSync(saPassword, 10)
 
   const admin = await prisma.admin.upsert({
     where: { email: saEmail },
-    update: {},
+    update: {
+      passwordHash,
+    },
     create: {
       email: saEmail,
       name: 'System Administrator',
+      passwordHash,
       role: Role.SA,
-      status: AdminStatus.PENDING,
+      status: AdminStatus.ACTIVE,
     },
   })
 

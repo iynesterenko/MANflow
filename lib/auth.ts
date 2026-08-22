@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 
 export interface SessionPayload {
-  adminId: string;
+  adminId: number;
   email: string;
   role: UserRole; 
 }
