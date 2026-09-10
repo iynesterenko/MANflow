@@ -1,4 +1,4 @@
-"use server";
+"use server"
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { Role } from "@/app/generated/prisma/enums";
@@ -8,7 +8,7 @@ import crypto from "crypto";
 export async function createAdminAction(prevState: any, formData: FormData) {
   const session = await getSession();
   if (!session || session.role !== "SA") {
-    error: "Немає прав";
+    return { error: "Немає прав" };
   }
   const email = (formData.get("email") as string)?.trim().toLowerCase();
   const name = (formData.get("name") as string)?.trim().toLowerCase();
@@ -46,7 +46,7 @@ export async function createAdminAction(prevState: any, formData: FormData) {
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
     },
   });
-  console.log("http://localhost:3000/reset-password?token=${token}");
+  console.log(`http://localhost:3000/reset-password?token=${token}`);
   revalidatePath("/admins");
   return {
     success: true,
