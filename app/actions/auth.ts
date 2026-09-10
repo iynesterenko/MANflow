@@ -17,11 +17,11 @@ export async function login(prevState: any, formData: FormData) {
     where: { email },
   });
   if (!admin) {
-    return "Невірний еймейл або пароль";
+    return { error: "Невірний ємейл або пароль" };
   }
   const isPasswordValid = await verifyPassword(password, admin.passwordHash || "aswd");
   if (!isPasswordValid) {
-    return "Невірний еймейл або пароль";
+    return { error: "Невірний ємейл або пароль" };
   }
   await createSession({
     adminId: admin.id,
