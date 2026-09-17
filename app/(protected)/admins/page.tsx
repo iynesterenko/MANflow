@@ -8,7 +8,7 @@ export default async function AdminsPage() {
   if (!session || session.role !== "SA") {
     redirect("/dashboard");
   }
-  const admins = await db.admin.findMany({
+  const admins = await db.admin.findMany({  
     orderBy: { createdAt: "desc" },
   });
 
@@ -35,6 +35,7 @@ export default async function AdminsPage() {
               <th className="px-6 py-3">Роль</th>
               <th className="px-6 py-3">Статус</th>
               <th className="px-6 py-3">Дата створення</th>
+              <th className="px-6 py-3">Дії</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
@@ -64,6 +65,9 @@ export default async function AdminsPage() {
                 </td>
                 <td className="px-6 py-4">
                   {new Date(admin.createdAt).toLocaleDateString("uk-UA")}
+                </td>
+                <td className="px-6 py-4">
+                  
                 </td>
               </tr>
             ))}
