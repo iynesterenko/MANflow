@@ -1,8 +1,10 @@
 "use server";
 import { redirect } from "next/navigation";
-import { db } from "@/lib/db";
+import { PrismaClient } from "@prisma/client";
 import { verifyPassword, createSession, deleteSession } from "@/lib/auth";
 import bcrypt from "bcryptjs";
+
+const prisma = new PrismaClient();
 
 export async function login(prevState: any, formData: FormData) {
   const [email, password] = [
@@ -12,19 +14,17 @@ export async function login(prevState: any, formData: FormData) {
   if (!email || !password) {
     return { error: "Заполніть всі поля" };
   }
-  const admin = await db.admin.findUnique({
-    where: { email },
+  const admin = await prisma.admin.findUnique({
+        where: { email },
   });
   if (!admin) {
-    return { error: "Невірний ємейл або пароль" };
-  }
-  const isPasswordValid = await verifyPassword(
-    password,
-    admin.passwordHash || "aswd",
-  );
+    return "Невірний еймейл або пароль";
+    }
+    const isPasswordValid = await verifyPassword(password, admin.password);
+
   if (!isPasswordValid) {
-    return { error: "Невірний ємейл або пароль" };
-  }
+    return "Невірний еймейл або пароль";
+    }
   await createSession({
     adminId: admin.id,
     email: admin.email,
