@@ -1,7 +1,8 @@
+import { UserRole } from "@/lib/auth";
 import Link from "next/link";
 
 interface SidebarProps {
-  userRole?: string;
+  userRole?: UserRole;
 }
 
 export default function Sidebar({ userRole }: SidebarProps) {

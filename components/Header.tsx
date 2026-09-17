@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { logoutAction } from "@/app/(protected)/actions";
+import { UserRole } from "@/lib/auth";
 
 interface HeaderProps {
   userEmail?: string;
-  userRole?: string;
+  userRole: UserRole;
 }
 
 export default function Header({ userEmail, userRole }: HeaderProps) {
