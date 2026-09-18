@@ -1,8 +1,34 @@
-export default function ResetPassword() {
+"use client";
+import { Suspense } from "react";
+import { useActionState } from "react";
+import { useSearchParams } from "next/navigation";
+import { ResetPasswordAction } from "./actions";
+export default function ResetPasswordPage() {
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token");
+  const [state, formAction, isPending] = useActionState(
+    ResetPasswordAction,
+    null,
+  );
   return (
-    <div className="text-center">
-      <h2 className="text-lg font-semibold text-slate-800">Скинути пароль</h2>
-      <p className="text-sm text-slate-500 mt-2">Reset Password Page Placeholder</p>
-    </div>
-  )
+    <Suspense>
+      <form action={formAction}>
+        <input type="hidden" name="token" value={token || ""}></input>
+        <input
+          type="password"
+          name="password"
+          placeholder="Новий пароль"
+          required
+        />{" "}
+        <input
+          type="password"
+          name="confirmPassword"
+          placeholder="Повторити пароль"
+          required
+        />{" "}
+        <button disabled={isPending}>Змінити пароль</button>
+        {state?.error && <p className="text-red-500">{state.error}</p>}
+      </form>
+    </Suspense>
+  );
 }
