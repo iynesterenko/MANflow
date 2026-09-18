@@ -41,7 +41,6 @@ export default function AdminActions({
 
   return (
     <div className="flex items-center gap-2">
-      {/* Кнопка зміни статусу */}
       <button
         onClick={handleToggle}
         disabled={isPending}
