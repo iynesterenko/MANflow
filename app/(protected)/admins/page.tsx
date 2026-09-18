@@ -2,13 +2,14 @@ import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import AdminActions from "./AdminActions";
 
 export default async function AdminsPage() {
   const session = await getSession();
   if (!session || session.role !== "SA") {
     redirect("/dashboard");
   }
-  const admins = await db.admin.findMany({  
+  const admins = await db.admin.findMany({
     orderBy: { createdAt: "desc" },
   });
 
@@ -67,7 +68,12 @@ export default async function AdminsPage() {
                   {new Date(admin.createdAt).toLocaleDateString("uk-UA")}
                 </td>
                 <td className="px-6 py-4">
-                  
+                  <AdminActions
+                    adminId={admin.id}
+                    adminEmail={admin.email}
+                    status={admin.status}
+                    isCurrentAdmin={session.adminId === admin.id}
+                  />
                 </td>
               </tr>
             ))}
