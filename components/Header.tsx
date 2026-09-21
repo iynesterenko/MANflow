@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { UserRole } from "@/lib/auth";
-import { logout } from "@/app/actions/auth"; // Імпортуємо Server Action виходу
+import { logout } from "@/app/actions/auth";
 
 interface HeaderProps {
   userEmail: string;

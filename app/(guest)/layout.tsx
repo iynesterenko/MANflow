@@ -8,7 +8,6 @@ export default function GuestLayout({
   return (
     <div className="min-h-screen w-full bg-slate-50 flex flex-col justify-center items-center p-4">
       <div className="w-full max-w-md space-y-6">
-        {/* Хедер / Брендинг */}
         <div className="text-center space-y-2">
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">
             МАН.Кадри
