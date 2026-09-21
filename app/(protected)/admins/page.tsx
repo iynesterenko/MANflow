@@ -6,7 +6,7 @@ import Link from "next/link";
 export default async function AdminsPage() {
   const session = await getSession();
   if (!session || session.role !== "SA") {
-    redirect("/dashboard");
+    redirect("/forbidden");
   }
   const admins = await db.admin.findMany({
     orderBy: { createdAt: "desc" },

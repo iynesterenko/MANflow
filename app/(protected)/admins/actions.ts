@@ -1,14 +1,15 @@
-"use server"
+"use server";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { Role } from "@/app/generated/prisma/enums";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import crypto from "crypto";
 
 export async function createAdminAction(prevState: any, formData: FormData) {
   const session = await getSession();
   if (!session || session.role !== "SA") {
-    return { error: "Немає прав" };
+    redirect("/forbidden");
   }
   const email = (formData.get("email") as string)?.trim().toLowerCase();
   const name = (formData.get("name") as string)?.trim().toLowerCase();
