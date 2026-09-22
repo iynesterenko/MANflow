@@ -1,34 +1,37 @@
 import Link from "next/link";
+import { logoutAction } from "@/app/(protected)/actions";
 import { UserRole } from "@/lib/auth";
 import { logout } from "@/app/actions/auth";
 
 interface HeaderProps {
-  userEmail: string;
+  userEmail?: string;
   userRole: UserRole;
 }
 
 export default function Header({ userEmail, userRole }: HeaderProps) {
   return (
-    <header className="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between">
+    <header className="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between text-slate-800">
       <div className="flex items-center space-x-3">
-        <span className="text-sm font-medium ">{userEmail}</span>
-        <span className="text-xs  rounded border ">
-          {userRole}
-        </span>
+        <span className="text-sm font-medium text-slate-700">{userEmail}</span>
+        {userRole && (
+          <span className="text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-300 font-semibold">
+            {userRole}
+          </span>
+        )}
       </div>
 
       <div className="flex items-center space-x-4">
         <Link
           href="/profile"
-          className="text-sm font-medium"
+          className="text-sm font-medium text-slate-600 hover:text-slate-900 transition"
         >
           Мій профіль
         </Link>
 
-        <form action={logout}>
+        <form action={logoutAction}>
           <button
             type="submit"
-            className="text-sm font-medium px-3 py-1.5 rounded-lg "
+            className="text-sm font-medium text-red-600 hover:text-red-700 transition"
           >
             Вийти
           </button>
