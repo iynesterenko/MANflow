@@ -3,10 +3,11 @@ import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import AdminActions from "./AdminActions";
+import { Role } from "@/app/generated/prisma/enums";
 
 export default async function AdminsPage() {
   const session = await getSession();
-  if (!session || session.role !== "SA") {
+  if (!session || session.role !== Role.SA) {
     redirect("/dashboard");
   }
   const admins = await db.admin.findMany({

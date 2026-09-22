@@ -7,7 +7,7 @@ import crypto from "crypto";
 
 export async function createAdminAction(prevState: any, formData: FormData) {
   const session = await getSession();
-  if (!session || session.role !== "SA") {
+  if (!session || session.role !== Role.SA) {
     return { error: "Немає прав" };
   }
   const email = (formData.get("email") as string)?.trim().toLowerCase();
@@ -58,7 +58,7 @@ export async function toggleAdminStatusAction(
   currentStatus: string,
 ) {
   const session = await getSession();
-  if (!session || session.role !== "SA") {
+  if (!session || session.role !== Role.SA) {
     return { error: "Немає прав" };
   }
   if (adminId == session.adminId) {
@@ -81,7 +81,7 @@ export async function deleteAdminAction(
   adminId: number,
 ) {
   const session = await getSession();
-  if (!session || session.role !== "SA") {
+  if (!session || session.role !== Role.SA) {
     return { error: "Немає прав" };
   }
   if (adminId == session.adminId) {

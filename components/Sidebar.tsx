@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { UserRole, SessionPayload } from "@/lib/auth";
+import { Role } from "@/app/generated/prisma/enums";
 
 interface SidebarProps {
   userRole: UserRole;
@@ -12,7 +13,7 @@ export default function Sidebar({ userRole }: SidebarProps) {
       <nav className=" flex-col space-y-2">
         <Link href="/dashboard">Головна</Link>
         <Link href="/employees">Працівники</Link>
-        {userRole === "SA" && <Link href="/admins">Адміністратори</Link>}
+        {userRole === Role.SA && <Link href="/admins">Адміністратори</Link>}
       </nav>
     </aside>
   );
