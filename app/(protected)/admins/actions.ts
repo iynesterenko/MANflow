@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { Role } from "@/app/generated/prisma/enums";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { logAuditEvent } from "@/lib/audit";
 import crypto from "crypto";
 
 export type CreateAdminState = {
@@ -18,7 +19,16 @@ export async function createAdminAction(
   formData: FormData
 ): Promise<CreateAdminState> {
   const session = await getSession();
+
   if (!session || session.role !== "SA") {
+    logAuditEvent({
+      adminId: session?.adminId || null,
+      adminEmail: session?.email || null,
+      action: "ADMIN_CREATE_FAILED",
+      entity: "Admin",
+      details: { reason: "Unauthorized / Forbidden" },
+    });
+
     redirect("/forbidden");
   }
 
@@ -27,10 +37,26 @@ export async function createAdminAction(
   const rawRole = formData.get("role") as string;
 
   if (!email || !name || !rawRole) {
+    logAuditEvent({
+      adminId: session.adminId,
+      adminEmail: session.email,
+      action: "ADMIN_CREATE_FAILED",
+      entity: "Admin",
+      details: { reason: "Missing required fields" },
+    });
+
     return { error: "Заповніть усі обов'язкові поля" };
   }
 
   if (!Object.values(Role).includes(rawRole as Role)) {
+    logAuditEvent({
+      adminId: session.adminId,
+      adminEmail: session.email,
+      action: "ADMIN_CREATE_FAILED",
+      entity: "Admin",
+      details: { reason: "Invalid role", providedRole: rawRole },
+    });
+
     return { error: "Некоректна роль користувача" };
   }
 
@@ -41,6 +67,14 @@ export async function createAdminAction(
   });
 
   if (existingAdmin) {
+    logAuditEvent({
+      adminId: session.adminId,
+      adminEmail: session.email,
+      action: "ADMIN_CREATE_FAILED",
+      entity: "Admin",
+      details: { reason: "Email already exists", targetEmail: email },
+    });
+
     return { error: "Адміністратор з таким Email вже існує" };
   }
 
@@ -62,7 +96,20 @@ export async function createAdminAction(
     data: {
       adminId: newAdmin.id,
       token,
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 години
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    },
+  });
+
+  logAuditEvent({
+    adminId: session.adminId,
+    adminEmail: session.email,
+    action: "ADMIN_CREATED",
+    entity: "Admin",
+    entityId: newAdmin.id,
+    details: {
+      createdEmail: email,
+      createdName: name,
+      createdRole: role,
     },
   });
 
