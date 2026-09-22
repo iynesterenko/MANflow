@@ -13,17 +13,19 @@ export async function login(prevState: any, formData: FormData) {
   if (!email || !password) {
     return { error: "Заполніть всі поля" };
   }
-  const admin = await prisma.admin.findUnique({
-        where: { email },
+  const admin = await db.admin.findUnique({
+    where: { email },
   });
   if (!admin) {
-    return "Невірний еймейл або пароль";
-    }
-    const isPasswordValid = await verifyPassword(password, admin.password);
-
+    return { error: "Невірний ємейл або пароль" };
+  }
+  const isPasswordValid = await verifyPassword(
+    password,
+    admin.passwordHash || "aswd",
+  );
   if (!isPasswordValid) {
-    return "Невірний еймейл або пароль";
-    }
+    return { error: "Невірний ємейл або пароль" };
+  }
   await createSession({
     adminId: admin.id,
     email: admin.email,
