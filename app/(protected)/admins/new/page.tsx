@@ -1,19 +1,33 @@
 "use client";
 
-import { useActionState } from "react";
+import { useEffect, useActionState } from "react";
 import { createAdminAction } from "../actions";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function NewAdminPage() {
+  const router = useRouter();
   const [state, formAction, isPending] = useActionState(createAdminAction, null);
+
+  useEffect(() => {
+    if (state?.error) {
+      toast.error(state.error);
+    } else if (state?.success && state?.message) {
+      toast.success(state.message);
+      router.push("/admins");
+    }
+  }, [state, router]);
 
   return (
     <div className="max-w-xl space-y-6 text-slate-900">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-800">Додати адміністратора</h1>
+        <h1 className="text-2xl font-bold text-slate-800">
+          Додати адміністратора
+        </h1>
         <Link
           href="/admins"
-          className="text-slate-600 hover:text-slate-900 text-sm font-medium"
+          className="text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors"
         >
           ← Назад до списку
         </Link>
@@ -42,6 +56,7 @@ export default function NewAdminPage() {
               type="email"
               name="email"
               required
+              autoComplete="email"
               placeholder="admin@example.com"
               className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm text-slate-900 bg-white"
             />
@@ -69,18 +84,6 @@ export default function NewAdminPage() {
           >
             {isPending ? "Створення..." : "Створити та згенерувати посилання"}
           </button>
-
-          {state?.error && (
-            <p className="text-sm text-red-600 font-medium bg-red-50 p-2.5 rounded border border-red-200">
-              {state.error}
-            </p>
-          )}
-
-          {state?.success && (
-            <p className="text-sm text-green-600 font-medium bg-green-50 p-2.5 rounded border border-green-200">
-              {state.message} 
-            </p>
-          )}
         </form>
       </div>
     </div>
