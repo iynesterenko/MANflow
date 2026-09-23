@@ -37,6 +37,20 @@ model PasswordResetToken {
   expiresAt DateTime
   createdAt DateTime @default(now())
 }
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  adminId    String?
+  adminEmail String?
+  action     String
+  entity     String?
+  entityId   String?
+  details    Json? 
+  createdAt  DateTime @default(now())
+
+  @@index([adminId])
+  @@index([action])
+  @@index([createdAt])
+}
 
 enum Role {
   SA

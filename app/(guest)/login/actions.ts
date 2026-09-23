@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/db";
 import { verifyPassword, createSession } from "@/lib/auth";
+import { logAuditEvent } from "@/lib/audit"; 
 
 export type ActionState = {
   error?: string;
@@ -16,6 +17,13 @@ export async function loginAction(
   const password = formData.get("password") as string;
 
   if (!email || !password) {
+    logAuditEvent({
+      adminEmail: email || null,
+      action: "AUTH_LOGIN_FAILED",
+      entity: "Session",
+      details: { reason: "Missing email or password" },
+    });
+
     return { error: "Заповніть усі поля" };
   }
 
@@ -24,10 +32,25 @@ export async function loginAction(
   });
 
   if (!admin) {
+    logAuditEvent({
+      adminEmail: email,
+      action: "AUTH_LOGIN_FAILED",
+      entity: "Session",
+      details: { reason: "User not found" },
+    });
+
     return { error: "Невірний email або пароль" };
   }
 
   if (admin.status !== "ACTIVE") {
+    logAuditEvent({
+      adminId: admin.id,
+      adminEmail: admin.email,
+      action: "AUTH_LOGIN_FAILED",
+      entity: "Session",
+      details: { reason: `Account status is ${admin.status}` },
+    });
+
     return { error: "Обліковий запис не активовано або заблоковано" };
   }
 
@@ -37,6 +60,14 @@ export async function loginAction(
   );
 
   if (!isPasswordValid) {
+    logAuditEvent({
+      adminId: admin.id,
+      adminEmail: admin.email,
+      action: "AUTH_LOGIN_FAILED",
+      entity: "Session",
+      details: { reason: "Invalid password" },
+    });
+
     return { error: "Невірний email або пароль" };
   }
 
@@ -46,6 +77,13 @@ export async function loginAction(
     role: admin.role,
   });
 
-  // Повертаємо success замість redirect()
+  logAuditEvent({
+    adminId: admin.id,
+    adminEmail: admin.email,
+    action: "AUTH_LOGIN_SUCCESS",
+    entity: "Session",
+    entityId: admin.id,
+  });
+
   return { success: true };
 }
