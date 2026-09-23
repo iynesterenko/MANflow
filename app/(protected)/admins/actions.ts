@@ -18,8 +18,8 @@ export async function createAdminAction(
   formData: FormData
 ): Promise<CreateAdminState> {
   const session = await getSession();
-  if (!session || session.role !== "SA") {
-    redirect("/forbidden");
+  if (!session || session.role !== Role.SA) {
+    return { error: "Немає прав" };
   }
 
   const email = (formData.get("email") as string)?.trim().toLowerCase();
@@ -76,4 +76,53 @@ export async function createAdminAction(
     success: true,
     message: `Адміністратора ${email} успішно створено!`,
   };
+}
+export async function toggleAdminStatusAction(
+  adminId: number,
+  currentStatus: string,
+) {
+  const session = await getSession();
+  if (!session || session.role !== Role.SA) {
+    return { error: "Немає прав" };
+  }
+  if (adminId == session.adminId) {
+    return { error: "Не можна змінити статус власного акаунту" };
+  }
+  const newStatus = currentStatus === "DISABLED" ? "ACTIVE" : "DISABLED";
+  try {
+    await db.admin.update({
+      where: { id: adminId },
+      data: { status: newStatus },
+    });
+
+    revalidatePath("/admins");
+    return { success: true };
+  } catch (error) {
+    return { error: "Не вдалося оновити статус" };
+  }
+}
+export async function deleteAdminAction(
+  adminId: number,
+) {
+  const session = await getSession();
+  if (!session || session.role !== Role.SA) {
+    return { error: "Немає прав" };
+  }
+  if (adminId == session.adminId) {
+    return { error: "Не можна видалити власний акаунт" };
+  }
+  try {
+    await db.passwordResetToken.deleteMany({
+      where: { adminId },
+    });
+
+    await db.admin.delete({
+      where: { id: adminId },
+    });
+
+    revalidatePath("/admins");
+    return { success: true };
+  } catch (error) {
+    return { error: "Не вдалося видалити акаунт" };
+  }
 }

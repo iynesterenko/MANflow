@@ -1,5 +1,7 @@
 import { UserRole } from "@/lib/auth";
 import Link from "next/link";
+import { UserRole, SessionPayload } from "@/lib/auth";
+import { Role } from "@/app/generated/prisma/enums";
 
 interface SidebarProps {
   userRole?: UserRole;
