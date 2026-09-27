@@ -1,9 +1,20 @@
 "use server";
 
-import { deleteSession } from "@/lib/auth";
-import {redirect} from "next/navigation"
+import { deleteSession, getSession } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { logAuditEvent } from "@/lib/audit";
 
-export async function logoutAction(){
-    await deleteSession()
-    redirect("/login")
+export async function logoutAction() {
+  const session = await getSession().catch(() => null);
+
+  await deleteSession();
+
+  logAuditEvent({
+    adminId: session?.adminId || null,
+    adminEmail: session?.email || null,
+    action: "AUTH_LOGOUT",
+    entity: "Session",
+  });
+
+  redirect("/login");
 }
